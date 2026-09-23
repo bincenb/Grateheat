@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GrateHeat | Subway heat for NYC schools</title>
+<meta name="description" content="GrateHeat: recovering waste heat from NYC subway grates for nearby public schools. NYAS Junior Academy, Climatizing Infrastructure: Green Retrofit, Fall 2026.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<style>
+@font-face{font-family:"Space Grotesk";src:url(fonts/space-grotesk-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Space Grotesk";src:url(fonts/space-grotesk-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"IBM Plex Sans";src:url(fonts/ibm-plex-sans-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"IBM Plex Sans";src:url(fonts/ibm-plex-sans-latin-600-normal.woff2) format("woff2");font-weight:600;font-display:swap}
+:root{--ink:#15202B;--paper:#F6F4EF;--card:#FFFFFF;--body:#3E4A56;--muted:#6B7480;--rule:#DDD8CD;--accent:#EB6834;--accent-text:#B8461B;--blue:#2A78D6;--peach:#F2A57F;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:17px/1.55 "IBM Plex Sans",system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+h1,h2,h3{font-family:"Space Grotesk","IBM Plex Sans",Arial,sans-serif;line-height:1.15}
+a{color:var(--accent-text)}
+header{background:var(--ink);color:var(--paper);padding:40px 16px 32px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header .wrap{padding:0}
+header p.kicker{color:var(--peach);font-size:15px;margin-bottom:10px}
+header h1{font-size:clamp(40px,7vw,68px);font-weight:700}
+header p.lede{font-size:clamp(18px,2.4vw,22px);color:#DCE3E9;max-width:760px;margin-top:10px}
+nav{position:sticky;top:0;z-index:1000;background:var(--paper);border-bottom:1px solid var(--rule)}
+nav .wrap{display:flex;gap:22px;overflow-x:auto;padding:12px 16px;white-space:nowrap}
+nav a{text-decoration:none;color:var(--ink);font-weight:600;font-size:15px}
+section{padding:44px 0 8px}
+section h2{font-size:clamp(26px,3.6vw,36px);font-weight:700;margin-bottom:8px}
+section p.sub{color:var(--body);max-width:760px;margin-bottom:18px}
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{font:600 15px "IBM Plex Sans",Arial,sans-serif;padding:8px 14px;border-radius:999px;border:1px solid var(--rule);background:var(--card);color:var(--ink);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#viewer{position:relative;height:min(62vh,560px);overflow:hidden}
+#viewer canvas{display:block;width:100%;height:100%}
+#viewer .hint{position:absolute;left:12px;bottom:10px;font-size:13px;color:var(--muted);background:rgba(255,255,255,.85);padding:3px 8px;border-radius:6px}
+#viewer .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 24px;padding:16px}
+.controls label{display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--body)}
+.controls label b{color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.caption{padding:0 16px 16px;color:var(--body);font-size:15px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+#map{height:min(70vh,620px);border-radius:10px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--body);margin:10px 0}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.list{max-height:min(70vh,620px);overflow:auto}
+.list table{width:100%;border-collapse:collapse;font-size:14px}
+.list th,.list td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.list th{position:sticky;top:0;background:var(--card);font-weight:600}
+.list tr[data-code]{cursor:pointer}
+.list tr[data-code]:hover{background:#FBF1EA}
+.filters{display:flex;gap:16px;flex-wrap:wrap;font-size:15px;color:var(--body)}
+.filters label{display:flex;gap:6px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:16px}
+.stat{border-top:3px solid var(--ink);padding-top:8px}
+.stat .n{font:700 clamp(26px,3.4vw,34px)/1.1 "Space Grotesk",Arial,sans-serif;color:var(--accent-text)}
+.stat .l{font-size:14px;color:var(--body)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;padding:16px 16px 0}
+.presets button{font:600 14px "IBM Plex Sans",Arial,sans-serif;padding:6px 12px;border-radius:6px;border:1px solid var(--rule);background:var(--paper);cursor:pointer}
+select{font:15px "IBM Plex Sans",Arial,sans-serif;padding:6px;border-radius:6px;border:1px solid var(--rule);background:var(--card)}
+#months{padding:0 16px 16px}
+.note{font-size:14px;color:var(--muted);padding:0 16px 16px}
+footer{padding:40px 16px 60px;color:var(--body);font-size:14px}
+footer ol{padding-left:20px;margin-top:8px}
+footer li{margin-bottom:4px}
+.leaflet-popup-content{font:14px/1.45 "IBM Plex Sans",Arial,sans-serif;margin:10px 12px}
+.leaflet-popup-content b{font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="kicker">NYAS Junior Academy · Climatizing Infrastructure: Green Retrofit · Fall 2026 · Team V.E.I.N.S.</p>
+    <h1>GrateHeat</h1>
+    <p class="lede">Trains heat the air in NYC&rsquo;s subway tunnels, and that heat escapes through sidewalk grates. GrateHeat catches it at the grate and sends it to a heat pump in the school next door.</p>
+  </div>
+</header>
+<nav><div class="wrap">
+  <a href="#model">3D model</a><a href="#map-section">School map</a><a href="#calc">Calculator</a><a href="#sources">Sources</a>
+</div></nav>
+
+<main class="wrap">
+<section id="model">
+  <h2>The design in 3D</h2>
+  <p class="sub">Drag to rotate, scroll or pinch to zoom. Use the sliders to open up the module or pull the test rig apart.</p>
+  <div class="tabs" role="group" aria-label="Choose a model">
+    <button data-scene="module" aria-pressed="true">Grate module (1:10)</button>
+    <button data-scene="street" aria-pressed="false">Street cutaway</button>
+    <button data-scene="rig" aria-pressed="false">Fin test rig</button>
+  </div>
+  <div class="panel">
+    <div id="viewer"><div class="loading">Loading model…</div><span class="hint">Drag to rotate · scroll to zoom</span></div>
+    <div class="controls" id="scene-controls"></div>
+    <p class="caption" id="scene-caption"></p>
+  </div>
+</section>
+
+<section id="map-section">
+  <h2>179 school buildings sit within 150 m of a subway tunnel</h2>
+  <p class="sub">Each dot is a public school building. Dots with a dark ring mark the 19 we&rsquo;d start with: in a state-designated disadvantaged community, still burning heating oil in 2024, and built before 1960. Click a dot or a row for details.</p>
+  <div class="filters">
+    <label><input type="radio" name="f" value="p"> First 19 only</label>
+    <label><input type="radio" name="f" value="150" checked> Within 150 m</label>
+    <label><input type="radio" name="f" value="250"> Within 250 m</label>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:#EB6834;box-shadow:0 0 0 2px #15202B"></span>First 19</span>
+    <span><span class="dot" style="background:#EB6834"></span>Disadvantaged community</span>
+    <span><span class="dot" style="background:#2A78D6"></span>Other, within 150 m</span>
+    <span><span class="dot" style="background:#B9B8B2"></span>150 to 250 m</span>
+    <span><span class="dot" style="background:#8A8984;border-radius:2px;height:4px"></span>Underground line</span>
+  </div>
+  <div class="grid2">
+    <div id="map" class="panel" role="region" aria-label="Map of school buildings and subway tunnels"></div>
+    <div class="panel list"><table><thead><tr><th>School (building)</th><th>Distance</th><th>Built</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </div>
+  <p class="note" style="padding:10px 0 0">Tunnels are drawn as straight lines between stations, so distances are approximate. School names come from FY2020 DOE records, and some schools have since moved or closed.</p>
+</section>
+
+<section id="calc">
+  <h2>What if the grates move more air, or less?</h2>
+  <p class="sub">Grate air speed changes the answer more than anything else in our model. Move the sliders, or enter your own field measurements.</p>
+  <div class="panel">
+    <div class="presets">
+      <button data-preset="low">Low airflow</button>
+      <button data-preset="mid">Middle case</button>
+      <button data-preset="high">High airflow</button>
+    </div>
+    <div class="controls">
+      <label>Air speed through the grate while flowing out <b><span id="v-speed"></span> m/s</b><input id="speed" type="range" min="0.2" max="3" step="0.1" value="1.2"></label>
+      <label>Open grate area per module <b><span id="v-area"></span> m²</b><input id="area" type="range" min="1" max="10" step="0.5" value="5"></label>
+      <label>Share of time air flows out <b><span id="v-out"></span>%</b><input id="outShare" type="range" min="20" max="80" step="5" value="50"></label>
+      <label>Modules at the school <b><span id="v-mod"></span></b><input id="modules" type="range" min="1" max="10" step="1" value="4"></label>
+      <label>Electricity price <b>$<span id="v-price"></span>/kWh</b><input id="elecPrice" type="range" min="0.10" max="0.40" step="0.01" value="0.22"></label>
+      <label>The school now heats with <select id="fuel"><option value="oil">Heating oil</option><option value="gas">Natural gas</option></select></label>
+      <label style="flex-direction:row;gap:8px;align-items:center"><input id="bank" type="checkbox" checked> Store summer tunnel heat in boreholes</label>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div id="months"></div>
+    <p class="note">This is a single middle-value case of our model. The full version runs 20,000 combinations of the uncertain inputs (median 164 MWh per module). The fixed values are listed in <a href="calc.js">calc.js</a>. It assumes the school can use 130&deg;F hot water, and older steam buildings can only use part of it.</p>
+  </div>
+</section>
+</main>
+
+<footer class="wrap" id="sources">
+  <h3>Sources</h3>
+  <ol>
+    <li>Office of the Governor of New York (Aug 2026). Plan to lower subway platform temperatures and harness thermal energy in Lower Manhattan.</li>
+    <li>Islington Council (2020), Bunhill 2 launch; GEA Group, Bunhill 2 energy centre case study.</li>
+    <li>Langman VA (1985). Nasal heat exchange in the reindeer. Respiration Physiology 59:279-287.</li>
+    <li>Li H et al. (2022). Piston wind at subway station vents. J Wind Eng Ind Aerodyn 229:105165.</li>
+    <li>NYC Open Data: DOE School Locations 2019-20; LL84 Energy and Water Disclosure 2024. NYSERDA Final Disadvantaged Communities (2023). MTA Stations.csv.</li>
+    <li>NOAA 1991-2020 Climate Normals (Central Park). NYC Local Law 97 emission factors. EIA New York gas and heating oil prices.</li>
+  </ol>
+  <p style="margin-top:14px">Map data &copy; OpenStreetMap contributors. Built by Team V.E.I.N.S. for the New York Academy of Sciences Junior Academy.</p>
+</footer>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
