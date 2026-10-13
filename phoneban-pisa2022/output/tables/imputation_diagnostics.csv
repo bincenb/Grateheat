@@ -1,0 +1,13 @@
+variable,n_missing,observed_mean,imputed_mean
+ban,13421,0.529,0.532
+stmt,13562,0.848,0.848
+tchrules,13566,0.956,0.943
+private,5324,0.317,0.039
+commsize,9268,3.381,3.462
+lschsize,17073,6.523,5.035
+sch_escs,5102,-0.079,0.0
+female,9,0.509,0.65
+grade,16,-0.1,-0.022
+escs,671,-0.07,-0.246
+immig,4177,1.329,1.417
+repeat,715,0.128,0.277

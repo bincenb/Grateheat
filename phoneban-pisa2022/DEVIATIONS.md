@@ -1,7 +1,13 @@
 # Deviations from the frozen protocol
 
-Every change made after `PROTOCOL.md` was frozen is listed here with the date, what changed and why.
+The protocol was frozen at commit `430d8a0` (2026-10-13 07:57 UTC). Every change after that is listed here with the date, what changed and why. Entries D1–D4 were decided **before any exposure–outcome model was run**. They came from data preparation and imputation diagnostics only.
 
-| Date | Section | Change | Reason | Could it change the primary result? |
-|---|---|---|---|---|
-| | | (none yet) | | |
+| # | Date | Section | Change | Reason | Could it change the primary result? |
+|---|---|---|---|---|---|
+| D1 | 2026-10-13 | 1, 3 | Analytic sample is **14** systems, not 15. France is excluded. | France ran parts of the WBQ but not the WB154 symptom checklist, so no French student has a valid outcome. The pre-specified exclusion rule (≥7 of 9 items) removes France automatically. | No: the rule is unchanged; only the description was wrong. |
+| D2 | 2026-10-13 | 4 | `private` uses PRIVATESCH, and where that is missing, the principal's answer SC013Q01TA (1 public → 0, 2 private → 1). | PRIVATESCH is missing for every school in HUN, MAC and SVN. SC013Q01TA covers HUN and SVN. Missingness of `private` falls from 14.8% to 4.8%. | Slightly: better confounder measurement in two systems. |
+| D3 | 2026-10-13 | 7.5 | A covariate missing for **every** unit in a system is not imputed. It is set to a constant (0), which the system fixed effect absorbs, so that system is not adjusted for that covariate. Affected: ESCS and school mean ESCS in **CRI** (the public file has no ESCS or parental education/occupation for Costa Rica); `private` in **MAC** (no school-type variable at all); school size in **NZL**. | With system fixed effects in the imputation model, a system with no observed values gives no information. The first imputation run extrapolated from other systems (imputed CRI mean ESCS +0.79 vs about −0.9 expected), which is plainly wrong. | Possibly, through residual confounding in CRI, MAC and NZL. Checked by D4. |
+| D4 | 2026-10-13 | 7.6 | New sensitivity check **S12**: drop CRI, MAC and NZL, the systems affected by D3. In E1 (ESCS × ban), CRI is excluded. | Shows whether D3 matters. | It is a check, not a change. |
+| D5 | 2026-10-13 | QC | Published comparison values come from the OECD ranking table (PISA 2022 Results, Vol. I, Table I.2.1, as reproduced by the Hechinger Report); the OECD site returned 403. Integer means only, so the tolerance check is against integers. | Access. | No. |
+| D6 | 2026-10-13 | 4 | `grade` (relative to modal grade) enters the model as 3 categories: below modal, modal (reference), above modal. | The protocol named the variable but not its functional form. This was fixed before any model was run. | No. |
+| D7 | 2026-10-13 | 7.2 | The SD used to express effects in SD units is the weighted SD of `psc` over the whole analytic sample (each system weighted equally), not separately by exposure group. | "Weighted pooled SD" was ambiguous. This is the simplest reading and was fixed before results. | No. |
