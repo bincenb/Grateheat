@@ -1,26 +1,26 @@
 analysis,source,model,term,systems,estimate,se,ci_low,ci_high,p,std_estimate,oecd_systems,oecd_estimate,oecd_se,systems_negative_sig,systems_positive_sig
-PRIMARY: any additional math instruction -> life satisfaction,MI,primary,ANY,71,0.16994,0.01253,0.14538,0.1945,6.7049e-42,0.066496,29,0.086651,0.017531,2,29
+PRIMARY: any additional math instruction -> life satisfaction,MI,primary,ANY,72,0.16931,0.012398,0.14501,0.19361,1.8429e-42,0.066249,30,0.08791,0.017119,2,29
 Unadjusted difference (complete case),complete case,unadjusted,ANY,72,0.18124,0.010819,0.16003,0.20244,5.4467e-63,0.070916,,,,4,35
-S1 complete case,complete case,S1_complete_case,ANY,71,0.18073,0.011396,0.1584,0.20307,1.2022e-56,0.070718,29,0.075949,0.014892,2,31
-S2/E2 dose: 1 form vs none,MI,S2_dose,NF1,71,0.14077,0.014202,0.11293,0.1686,3.7055e-23,0.055081,29,0.080661,0.019786,1,19
-S2/E2 dose: 2 forms vs none,MI,S2_dose,NF2,71,0.16564,0.017383,0.13157,0.19971,1.5863e-21,0.064814,29,0.086446,0.026043,0,20
-S2/E2 dose: 3+ forms vs none,MI,S2_dose,NF3P,71,0.23126,0.020373,0.19133,0.27119,7.3051e-30,0.090488,29,0.10538,0.034684,2,31
-S3 modal grade only,MI,S3_modal_grade,ANY,68,0.17249,0.014079,0.1449,0.20009,1.6462e-34,0.067495,26,0.091518,0.019403,1,26
-S4 drop 4-5 forms,MI,S4_drop_4plus_forms,ANY,71,0.15863,0.012596,0.13395,0.18332,2.276e-36,0.062072,29,0.084706,0.017701,2,29
+S1 complete case,complete case,S1_complete_case,ANY,72,0.18023,0.011283,0.15812,0.20235,1.9448e-57,0.070523,30,0.078242,0.0146,2,32
+S2/E2 dose: 1 form vs none,MI,S2_dose,NF1,72,0.14079,0.014054,0.11325,0.16834,1.2726e-23,0.055091,30,0.082727,0.019334,1,19
+S2/E2 dose: 2 forms vs none,MI,S2_dose,NF2,72,0.16449,0.017204,0.13077,0.19821,1.1609e-21,0.064364,30,0.086327,0.025419,0,20
+S2/E2 dose: 3+ forms vs none,MI,S2_dose,NF3P,72,0.22997,0.020181,0.19042,0.26952,4.3976e-30,0.089984,30,0.10648,0.03384,2,31
+S3 modal grade only,MI,S3_modal_grade,ANY,69,0.1718,0.013915,0.14452,0.19907,5.1125e-35,0.067222,27,0.092737,0.018877,1,26
+S4 drop 4-5 forms,MI,S4_drop_4plus_forms,ANY,72,0.15818,0.012462,0.13375,0.1826,6.5084e-37,0.061893,30,0.086077,0.017283,2,29
 S5 negative control: FEELSAFE (WLE units),complete case,S5_negctrl_feelsafe,ANY,67,0.022128,0.0046516,0.013011,0.031245,1.9639e-06,0.022128,26,-0.001156,0.0062346,1,10
-S7 adjusted for math achievement (10 PVs),complete case,S7_adjust_math_pv,ANY,71,0.16654,0.011583,0.14384,0.18924,7.0522e-47,0.065165,29,0.068081,0.015221,2,29
-S9a 'nothing ticked' = non-participant,complete case,S9a_nothing_as_none,ANY,71,0.13848,0.0099302,0.11902,0.15794,3.3623e-44,0.054185,29,0.066545,0.014159,2,28
-S9b contradictory = participant,complete case,S9b_contradictory_as_some,ANY,71,0.16535,0.011085,0.14363,0.18708,2.5843e-50,0.064701,29,0.076633,0.014396,2,29
-S9c straight-liners = participant,complete case,S9c_straightline_as_some,ANY,71,0.20728,0.011323,0.18509,0.22947,7.4313e-75,0.081106,29,0.084119,0.014984,2,38
-S10 systems with <=40% exposure missing,MI,primary,ANY,52,0.14534,0.013118,0.11963,0.17105,1.5778e-28,0.05687,29,0.086651,0.017531,2,20
-E1 interaction ANY x ESCS (per ESCS unit),MI,E1_escs,ANYxESCS,71,-0.04647,0.01271,-0.071382,-0.021559,0.00025606,-0.018183,29,-0.069866,0.020405,7,0
-E1 interaction ANY x female,MI,E1_sex,ANYxFEMALE,71,0.036069,0.021429,-0.0059305,0.078069,0.092334,0.014113,29,0.014441,0.028498,0,1
-E1 interaction ANY x below modal grade,MI,E1_grade,ANYxBELOW,59,0.046707,0.080447,-0.11097,0.20438,0.56151,0.018276,23,0.13181,0.099739,0,2
-E1 interaction ANY x above modal grade,MI,E1_grade,ANYxABOVE,59,-0.05234,5.8865e+15,-1.1537e+16,1.1537e+16,1,-0.02048,23,-0.23207,0.15543,1,2
-E2 form: one_on_one (joint model),complete case,E2_forms,one_on_one,71,0.035657,0.012943,0.010288,0.061025,0.0058729,0.013952,29,0.010437,0.019497,6,12
-E2 form: online (joint model),complete case,E2_forms,online,71,0.060792,0.014124,0.033111,0.088474,1.675e-05,0.023787,29,-0.02056,0.022423,4,12
-E2 form: video (joint model),complete case,E2_forms,video,71,-0.0098872,0.014486,-0.038279,0.018505,0.4949,-0.0038687,29,-0.016416,0.022517,5,4
-E2 form: small_group (joint model),complete case,E2_forms,small_group,71,0.10697,0.014545,0.078462,0.13548,1.9159e-13,0.041856,29,0.065443,0.02226,1,20
-E2 form: large_group (joint model),complete case,E2_forms,large_group,71,0.17548,0.018026,0.14015,0.21081,2.1351e-22,0.068664,29,0.18579,0.028783,0,20
-E4 math anxiety ANXMAT (WLE units),complete case,E4_anxmat,ANY,65,0.17724,0.005209,0.16703,0.18745,9.4508e-254,0.17724,29,0.30735,0.0072992,9,40
+S7 adjusted for math achievement (10 PVs),complete case,S7_adjust_math_pv,ANY,72,0.16631,0.011466,0.14384,0.18879,1.1211e-47,0.065077,30,0.07082,0.01491,2,30
+S9a 'nothing ticked' = non-participant,complete case,S9a_nothing_as_none,ANY,72,0.13859,0.0098437,0.11929,0.15788,5.1358e-45,0.054227,30,0.0692,0.013898,2,29
+S9b contradictory = participant,complete case,S9b_contradictory_as_some,ANY,72,0.16477,0.010978,0.14325,0.18628,6.4116e-51,0.064472,30,0.078185,0.014125,2,29
+S9c straight-liners = participant,complete case,S9c_straightline_as_some,ANY,72,0.20636,0.011211,0.18439,0.22833,1.1466e-75,0.080745,30,0.086012,0.014682,2,38
+S10 systems with <=40% exposure missing,MI,primary,ANY,53,0.14495,0.012943,0.11958,0.17032,4.1446e-29,0.056716,30,0.08791,0.017119,2,20
+E1 interaction ANY x ESCS (per ESCS unit),MI,E1_escs,ANYxESCS,72,-0.045006,0.012616,-0.069732,-0.02028,0.00036043,-0.01761,30,-0.065572,0.020023,7,0
+E1 interaction ANY x female,MI,E1_sex,ANYxFEMALE,72,0.034342,0.021261,-0.0073296,0.076013,0.10626,0.013438,30,0.011016,0.028119,0,1
+E1 interaction ANY x below modal grade,MI,E1_grade,ANYxBELOW,54,0.05813,0.039623,-0.019531,0.13579,0.14236,0.022745,23,0.14534,0.056274,0,2
+E1 interaction ANY x above modal grade,MI,E1_grade,ANYxABOVE,40,-0.028088,0.050446,-0.12696,0.070785,0.57767,-0.01099,14,0.050036,0.086833,0,1
+E2 form: one_on_one (joint model),complete case,E2_forms,one_on_one,72,0.033248,0.012816,0.0081297,0.058366,0.0094779,0.01301,30,0.0054973,0.019049,6,12
+E2 form: online (joint model),complete case,E2_forms,online,72,0.062158,0.013987,0.034745,0.089572,8.8249e-06,0.024322,30,-0.014569,0.021894,4,12
+E2 form: video (joint model),complete case,E2_forms,video,72,-0.010137,0.014366,-0.038294,0.018019,0.48041,-0.0039666,30,-0.016798,0.022071,5,4
+E2 form: small_group (joint model),complete case,E2_forms,small_group,72,0.1066,0.0144,0.078377,0.13482,1.3337e-13,0.041711,30,0.065942,0.021737,1,20
+E2 form: large_group (joint model),complete case,E2_forms,large_group,72,0.17497,0.01783,0.14003,0.20992,9.8491e-23,0.068466,30,0.18423,0.028025,0,20
+E4 math anxiety ANXMAT (WLE units),complete case,E4_anxmat,ANY,66,0.17428,0.0051553,0.16418,0.18438,1.5954e-250,0.17428,30,0.2965,0.0071441,9,40
 E4 psychosomatic complaints (1-5 scale),complete case,E4_psysom,ANY,13,0.060432,0.010018,0.040797,0.080067,1.6167e-09,,7,0.058237,0.011525,1,7

@@ -51,10 +51,14 @@ p = s.participation_rate
 # meta-regression line: centred at the mean participation rate, slope per 10 percentage points
 fit = dersimonian_laird(s.primary_est, s.primary_se ** 2, X=(p - p.mean()) * 10)
 ax.plot(xg * 100, fit["coef"][0] + fit["coef"][1] * (xg - p.mean()) * 10, color=PALETTE["ink"], lw=1.0)
-for _, r in s.iterrows():
-    if abs(r.primary_est) > 0.45 or r.participation_rate > 0.75 or r.participation_rate < 0.12:
-        ax.annotate(r.CNT, (r.participation_rate * 100, r.primary_est), xytext=(3, 0), textcoords="offset points",
-                    fontsize=6, va="center", color=PALETTE["ink"])
+# label only the extremes: highest and lowest estimate, lowest and highest participation
+ends = {s.primary_est.idxmax(), s.primary_est.idxmin(), s.participation_rate.idxmin(), s.participation_rate.idxmax()}
+for i in ends:
+    r = s.loc[i]
+    ax.annotate(r.CNT, (r.participation_rate * 100, r.primary_est), xytext=(4, 0), textcoords="offset points",
+                fontsize=6, va="center", color=PALETTE["ink"])
+ax.text(0.02, 0.97, "OECD", transform=ax.transAxes, ha="left", va="top", color=PALETTE["primary"], fontsize=7)
+ax.text(0.02, 0.91, "Partner", transform=ax.transAxes, ha="left", va="top", color=PALETTE["control"], fontsize=7)
 ax.set_xlabel("Students using additional math instruction (%)")
 ax.set_ylabel("Adjusted difference (points)")
 fig.savefig(os.path.join(FIG, "fig2_prevalence.pdf"))
