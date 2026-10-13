@@ -75,9 +75,10 @@ log = [f"raw students: {n_raw}, systems: {cov.shape[0]}",
 df = df[df.CNT.isin(core_ok.index)].copy()
 log.append(f"analysis students: {len(df)}")
 
-# school-level covariates missing for >50% of a system's students are dropped from that system's model
+# non-core covariates missing for >50% of a system's students are dropped from that system's model
+# (protocol rule 3 named only school-level covariates; extended to all non-core covariates, see DEVIATIONS.md)
 school_drop = {}
-for c in ["PRIVATE", "LOC5"]:
+for c in ["GRADE3", "IMMIG", "REPEAT", "PRIVATE", "LOC5"]:
     share = df.groupby("CNT")[c].apply(lambda s: s.isna().mean())
     school_drop[c] = sorted(share[share > .5].index)
     log.append(f"{c} omitted (>50% missing) in: {school_drop[c]}")

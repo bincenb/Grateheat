@@ -32,9 +32,13 @@ SCHOOL_DROP = {k: set(v.split(",")) - {""} for k, v in drop.items()}
 # ---------------------------------------------------------------- design
 def covariates(d, cnt, grade=True):
     """Pre-registered covariate matrix (protocol §4)."""
-    cols = {"FEMALE": d.FEMALE, "AGE": d.AGE - 15.75, "ESCS": d.ESCS, "REPEAT": d.REPEAT,
-            "IMMIG2": (d.IMMIG == 2) * 1.0, "IMMIG3": (d.IMMIG == 3) * 1.0}
-    if grade:
+    cols = {"FEMALE": d.FEMALE, "AGE": d.AGE - 15.75, "ESCS": d.ESCS}
+    if cnt not in SCHOOL_DROP["REPEAT"]:
+        cols["REPEAT"] = d.REPEAT
+    if cnt not in SCHOOL_DROP["IMMIG"]:
+        cols["IMMIG2"] = (d.IMMIG == 2) * 1.0
+        cols["IMMIG3"] = (d.IMMIG == 3) * 1.0
+    if grade and cnt not in SCHOOL_DROP["GRADE3"]:
         cols["GR_BELOW"] = (d.GRADE3 < 0) * 1.0
         cols["GR_ABOVE"] = (d.GRADE3 > 0) * 1.0
     if cnt not in SCHOOL_DROP["PRIVATE"]:
@@ -59,14 +63,31 @@ def fit(d, y, terms, cnt, grade=True):
     return {t: (beta[i], var[i]) for t, i in zip(keep, idx)}, int(ok.sum())
 
 
-def model_set(d, cnt):
+MIN_CELL = 30  # interaction terms need >= 30 observed students in each exposure x subgroup cell
+
+
+def cells_ok(g, group):
+    """True if every exposure x subgroup cell has at least MIN_CELL observed students."""
+    obs = g.ANYADD.notna() & group.notna()
+    if not obs.any():
+        return False
+    tab = pd.crosstab(g.ANYADD[obs], group[obs])
+    return tab.shape == (2, 2) and bool((tab >= MIN_CELL).all().all())
+
+
+def model_set(d, cnt, ok):
     """Models run on each imputed dataset. Returns {name: {term: (b, v)}}."""
     out = {}
     A = pd.DataFrame({"ANY": d.ANYADD}, index=d.index)
     out["primary"], _ = fit(d, "LS", A, cnt)
     out["E1_escs"], _ = fit(d, "LS", A.assign(ANYxESCS=d.ANYADD * d.ESCS), cnt)
-    out["E1_sex"], _ = fit(d, "LS", A.assign(ANYxFEMALE=d.ANYADD * d.FEMALE), cnt)
-    out["E1_grade"], _ = fit(d, "LS", A.assign(ANYxBELOW=d.ANYADD * (d.GRADE3 < 0), ANYxABOVE=d.ANYADD * (d.GRADE3 > 0)), cnt)
+    out["E1_sex"], _ = fit(d, "LS", A.assign(ANYxFEMALE=d.ANYADD * d.FEMALE), cnt) if ok["sex"] else (None, 0)
+    gr = {}
+    if ok["below"]:
+        gr["ANYxBELOW"] = d.ANYADD * (d.GRADE3 < 0)
+    if ok["above"]:
+        gr["ANYxABOVE"] = d.ANYADD * (d.GRADE3 > 0)
+    out["E1_grade"], _ = fit(d, "LS", A.assign(**gr), cnt) if gr else (None, 0)
     nf = pd.DataFrame({"NF1": (d.NFORMS == 1) * 1.0, "NF2": (d.NFORMS == 2) * 1.0, "NF3P": (d.NFORMS >= 3) * 1.0}, index=d.index)
     out["S2_dose"], _ = fit(d, "LS", nf, cnt)
     modal = d[d.GRADE3 == 0]
@@ -120,21 +141,19 @@ def run_system(args):
     res["cc"] = cc
 
     # ---- multiple imputation
-    imp_cols = ["LS", "NFORMS", "ESCS", "GRADE3", "IMMIG", "REPEAT"]
-    if cnt not in SCHOOL_DROP["PRIVATE"]:
-        imp_cols.append("PRIVATE")
-    if cnt not in SCHOOL_DROP["LOC5"]:
-        imp_cols.append("LOC5")
+    imp_cols = ["LS", "NFORMS", "ESCS"] + [c for c in ["GRADE3", "IMMIG", "REPEAT", "PRIVATE", "LOC5"] if cnt not in SCHOOL_DROP[c]]
     imp_cols = [c for c in imp_cols if g[c].notna().any()]
     aux = ["FEMALE", "AGE", "ANXMAT", "BELONG", "SCH_ESCS", "LOGW"]
     aux = [c for c in aux if g[c].notna().any()]
     completed = mice_pmm(g, imp_cols, aux, M, ITERS, seed)
+    ok = {"sex": cells_ok(g, g.FEMALE), "below": cells_ok(g, (g.GRADE3 < 0).where(g.GRADE3.notna())),
+          "above": cells_ok(g, (g.GRADE3 > 0).where(g.GRADE3.notna()))}
     per_imp = []
     for comp in completed:
         d = g.copy()
         d[imp_cols] = comp
         d["ANYADD"] = (d.NFORMS > 0) * 1.0
-        per_imp.append(model_set(d, cnt))
+        per_imp.append(model_set(d, cnt, ok))
     mi = {}
     for name in per_imp[0]:
         fits = [p[name] for p in per_imp]
