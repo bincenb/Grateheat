@@ -1,0 +1,54 @@
+Causal diagram (DAG) used to choose covariates. Arrows read "causes".
+Paste the dagitty block into https://dagitty.net to view and check adjustment sets.
+
+dag {
+  ANYADD [exposure]
+  LIFESAT [outcome]
+
+  ESCS -> ANYADD
+  ESCS -> LIFESAT
+  Sex -> ANYADD
+  Sex -> LIFESAT
+  Age -> ANYADD
+  Age -> LIFESAT
+  Grade -> ANYADD
+  Grade -> LIFESAT
+  Immig -> ANYADD
+  Immig -> LIFESAT
+  Immig -> ESCS
+  PriorAch [latent]
+  PriorAch -> Repeat
+  PriorAch -> ANYADD
+  PriorAch -> LIFESAT
+  PriorAch -> MathAch
+  Repeat -> Grade
+  Repeat -> LIFESAT
+  SchoolType -> ANYADD
+  SchoolType -> LIFESAT
+  Location -> ANYADD
+  Location -> LIFESAT
+  ESCS -> SchoolType
+  ParentPressure [latent]
+  ParentPressure -> ANYADD
+  ParentPressure -> LIFESAT
+  Distress [latent]
+  Distress -> ANYADD
+  Distress -> LIFESAT
+
+  ANYADD -> MathAch
+  ANYADD -> MathAnx
+  ANYADD -> Homework
+  ANYADD -> LIFESAT
+  MathAch -> LIFESAT
+  MathAnx -> LIFESAT
+  Homework -> LIFESAT
+}
+
+Minimal adjustment set used: ESCS, Sex, Age, Grade, Immig, Repeat (proxy for PriorAch),
+SchoolType, Location. Unblocked paths remain through PriorAch (only partly proxied by
+Repeat), ParentPressure and earlier Distress, which are unmeasured. That is why the
+E-value and negative-control outcome are reported.
+
+Not adjusted: MathAch, MathAnx and Homework are descendants of the exposure (mediators).
+Adjusting for MathAch also opens PriorAch paths in complicated ways, so it is used
+only as a bounding sensitivity analysis (S7).

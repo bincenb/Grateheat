@@ -1,0 +1,5 @@
+*.SAV
+*.zip
+*.parquet
+__pycache__/
+work/

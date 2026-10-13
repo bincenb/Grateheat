@@ -1,0 +1,38 @@
+10.1186/s40536-024-00228-5  Karakus et al. 2024, tutoring and math in PISA 2022: 7 citing works
+10.3389/fpsyg.2022.860179  Liang et al. 2022, shadow education and wellbeing, PISA 2018 Hong Kong: 12 citing works
+10.3390/ijerph18031222  Taiwan 2021, shadow education and mental health: 13 citing works
+10.3390/bs15070885  China 2025, shadow education duration and depression: 0 citing works
+10.1111/ejed.12413  Zhang & Bray 2020, comparative research on shadow education (review): 183 citing works
+10.1108/s1479-353920180000020004  Global patterns of shadow education use (cross-national): 93 citing works
+10.1146/annurev-soc-081715-074341  Park et al. 2016, learning beyond the school walls (review): 193 citing works
+
+Unique citing works scanned: 419  (with abstract: 186)
+Flagged (tutoring AND wellbeing terms): 26
+
+[LSA] 2022 10.3389/fpsyg.2022.860179 | The Effect of Shadow Education on Hong Kong Student Wellbeing: Evidence From PISA 2018
+[   ] 2026 10.1155/cad/3889889 | Exploring the Relationship Between Parental Involvement and Family Education Choice: Evidence From China
+[   ] 2025 10.1002/berj.4192 | Examining the nature, effectiveness and implications of shadow education in rural Kazakhstan: A participatory study of p
+[   ] 2025 10.29121/granthaalayah.v13.i9.2025.6238 | PSYCHOLOGICAL COSTS OF ACADEMIC SUCCESS: EXAMINING THE IMPACT OF SHADOW EDUCATION ON CHILDREN'S MENTAL HEALTH
+[   ] 2025 10.1111/ejed.70244 | Voluntary Restriction or Freedom to Flourish? Self‐Regulation of Commercial Tutoring Providers for Managing Shadow Educa
+[   ] 2025 10.70148/rise.12 | The Heart of Teaching: Can Empathy-Focused CPD Elevate Tutoring?
+[   ] 2025 10.1515/eduling-2025-0009 | English tutors’ emotions, agency, and identity development in the aftermath of China’s Double Reduction policy
+[   ] 2025 10.2478/jesm-2025-0014 | Tutoring and Mentoring – Vital Tools in Fostering Equity, Quality, and Inclusion in Higher Education
+[   ] 2025 10.1177/0044118x241309672 | Private Tutoring, Sleep Time, and Depressive Symptoms Among Adolescent Students in China
+[   ] 2024 10.4018/979-8-3693-2952-8.ch007 | Does Tutoring Participation Affect Relationship Patterns and Mental Well-Being?
+[   ] 2024 10.4018/979-8-3693-2952-8.ch014 | Revisiting the Role of Private Tutoring on Student Outcomes in East Asian Countries
+[   ] 2024 10.3390/educsci14111143 | Marketization of Shadow Education in Switzerland: How “Edupreneurs” Promote Preparation Programmes for a Selective Schoo
+[   ] 2024 10.4018/979-8-3693-2952-8.ch011 | Unraveling the Shadow
+[   ] 2024 10.1080/00071005.2024.2331476 | Shadow Education Uptake in Ireland: Inequalities and Wellbeing in a High-Stakes Context
+[   ] 2024 10.22550/2174-0909.4059 | Educación en la sombra en Latinoamérica: armando el rompecabezas.
+[   ] 2024 10.1007/s35834-024-00433-w | How do school experiences in adolescence affect educational investment in adulthood? The case of parental investment in 
+[   ] 2023 10.1080/10611932.2023.2251848 | Private Tutoring Classes and Emotional Well-Being in China: Bidirectional Relationship and the Role of Academic Achievem
+[   ] 2023 10.1177/2057150x231165145 | Does cram school participation bring about negative emotions? Causal inference based on Chinese Education Panel Survey (
+[   ] 2023 10.1080/02103702.2023.2194792 | Understanding private supplementary tutoring: metaphors, diversities and agendas for shadow education research (
+       
+[   ] 2023 10.1177/2057150x231165143 | Competition and game-playing: The academic returns and mental health costs of private tutoring
+[   ] 2022 10.3224/ijree.v9i2.03 | “It’s not about the grades!” On Shadow Education in Denmark and How Parents Wish to Help Their Children Get Ahead
+[   ] 2021 10.1177/20965311211042026 | Modes and Trajectories of Shadow Education in Denmark and China: Fieldwork Reflections by a Comparativist
+[   ] 2021 10.3390/ijerph18031222 | The Heterogeneous Effects of Participation in Shadow Education on Mental Health of High School Students in Taiwan
+[   ] 2019 10.1002/berj.3575 | Marketising private tuition: Representations of tutors’ competence, entrepreneurial opportunities and service legitimati
+[   ] 2019 10.1111/bjep.12281 | Assessing the instructional quality of private tutoring and its effects on student outcomes: Analyses from the German Na
+[   ] 2018 10.1080/21620555.2018.1526069 | Effects of Cram Schooling on Academic Achievement and Mental Health of Junior High Students in Taiwan

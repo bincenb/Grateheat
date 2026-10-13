@@ -1,0 +1,11 @@
+## Illuminating the shadows private supplementary tutoring PISA 2022
+Traceback (most recent call last):
+  File "/home/user/Grateheat/tutoring-wellbeing/novelty/find_anchors.py", line 14, in <module>
+    for w in search(q):
+             ~~~~~~^^^
+  File "/home/user/Grateheat/tutoring-wellbeing/novelty/s2.py", line 15, in search
+    return get(f"/paper/search?limit={n}&fields={fields}&query=" + urllib.parse.quote(q))["data"]
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Grateheat/tutoring-wellbeing/novelty/s2.py", line 13, in get
+    raise RuntimeError("failed " + url)
+RuntimeError: failed https://api.semanticscholar.org/graph/v1/paper/search?limit=8&fields=paperId,title,year,citationCount,externalIds&query=Illuminating%20the%20shadows%20private%20supplementary%20tutoring%20PISA%202022
