@@ -1,0 +1,7 @@
+raw students: 613744, systems: 80
+systems with >=50% ST297 and ST016: 73
+dropped for an entirely missing core covariate: ['CRI']
+analysis systems: 72
+analysis students: 538815
+PRIVATE omitted (>50% missing) in: ['IRL', 'ISL', 'MAC', 'MNE', 'SWE']
+LOC5 omitted (>50% missing) in: ['SWE']
