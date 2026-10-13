@@ -1,0 +1,6 @@
+data_raw/*
+!data_raw/README.md
+data_work/
+__pycache__/
+*.parquet
+*.pkl
