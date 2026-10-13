@@ -1,0 +1,115 @@
+                              variable       All      Ban   No ban  Ban missing % missing
+               Students (unweighted n) 111616.00 51936.00 46259.00     13421.00          
+                Schools (unweighted n)   4520.00  2065.00  1838.00       617.00          
+                             Female, %     50.90    51.20    50.80        50.40       0.0
+                            Age, years     15.80    15.81    15.80        15.81       0.0
+                  Below modal grade, %     18.70    19.80    17.10        21.70       0.0
+                                  ESCS     -0.19    -0.20    -0.19        -0.14       5.2
+               Immigrant background, %     19.10    22.40    16.10        21.30       3.7
+                   Repeated a grade, %     12.30    13.00    11.50        13.20       0.6
+                     Private school, %     20.90    27.20    15.80        22.80       4.8
+                    City >1 million, %     19.40    23.80    15.40        27.90       8.3
+                      School enrolment    951.80   884.27   976.92      1628.46      15.3
+                      School mean ESCS     -0.19    -0.20    -0.20        -0.14       4.6
+             Psychosomatic score (1-5)      2.30     2.29     2.30         2.30       0.0
+         Multiple health complaints, %     41.70    40.50    42.50        42.30       0.0
+     Difficulty getting to sleep (1-5)      2.44     2.40     2.47         2.45       0.4
+          Psychological subscale (1-5)      2.41     2.39     2.43         2.41       0.0
+                Somatic subscale (1-5)      2.16     2.16     2.15         2.16       0.0
+Self-rated health (1 excellent-4 poor)      1.82     1.80     1.83         1.85       5.1
+system  oecd  students  schools  ban_pct  ban_missing_pct  psc_mean  mhc_pct  sleep_mean
+   ARE     0     19960      830     76.3             18.2      2.52     47.5        2.70
+   BRA     0      7481      586     38.1             13.9      2.34     47.0        2.41
+   CRI     1      5102      192     12.7             17.5      2.53     55.3        2.71
+   ESP     1     28316      962     67.4              7.9      2.26     38.4        2.36
+   HKG     0      5419      163     66.4             29.2      2.08     29.4        2.17
+   HUN     1      5804      262     19.5             12.5      2.41     44.8        2.59
+   IRL     1      5352      170     55.8              6.3      2.30     40.0        2.45
+   MAC     0      4372       46     46.3              0.0      2.15     34.5        2.20
+   MEX     1      6185      280     21.9              0.5      2.39     48.2        2.57
+   NLD     1      4515      149      8.2             20.4      2.13     32.5        2.39
+   NZL     1      4096      169     18.1             21.9      2.35     44.4        2.68
+   PAN     0      3544      205     45.4             23.6      2.24     47.1        2.15
+   SAU     0      5321      192     70.7              1.0      2.35     41.9        2.42
+   SVN     1      6149      314     44.6              3.8      2.13     33.5        2.33
+
+Weighted SD of psc (each system weighted equally): 1.0112
+
+PRIMARY: ban -> psychosomatic score (1-5)               +0.0012 (-0.0198, +0.0223) p=0.91  n=111616  [41s]
+O2 multiple health complaints (pp)                      -0.2980 (-1.3344, +0.7384) p=0.568  n=111616  [39s]
+O3 difficulty getting to sleep (1-5)                    -0.0139 (-0.0451, +0.0172) p=0.375  n=111152  [39s]
+O4a psychological subscale (1-5)                        -0.0023 (-0.0258, +0.0211) p=0.842  n=111616  [41s]
+O4b somatic subscale (1-5)                              +0.0058 (-0.0148, +0.0263) p=0.578  n=111616  [41s]
+O5 self-rated health (1-4, higher=worse)                +0.0009 (-0.0176, +0.0195) p=0.921  n=105944  [37s]
+E1a ban x female                                        -0.0877 (-0.1243, -0.0511) p=1.08e-05  n=111616  [45s]
+E1b ban x ESCS (CRI excluded)                           -0.0220 (-0.0395, -0.0045) p=0.0144  n=106514  [42s]
+E1c ban x modal grade                                   -0.0021 (-0.0351, +0.0309) p=0.9  n=111616  [42s]
+E2a ban x OECD member                                   -0.0198 (-0.0614, +0.0218) p=0.346  n=111616  [44s]
+E3 policy combination (ref: no ban, no statement)       -0.0020 (-0.0397, +0.0357) p=0.917  n=111616  [43s]
+E2b system ARE                                          -0.0098 (-0.0625, +0.0429) p=0.708  n=19960  [3s]
+E2b system BRA                                          +0.0242 (-0.0416, +0.0900) p=0.464  n=7481  [2s]
+E2b system CRI                                          +0.0833 (-0.0306, +0.1973) p=0.149  n=5102  [1s]
+E2b system ESP                                          +0.0011 (-0.0471, +0.0492) p=0.965  n=28316  [8s]
+E2b system HKG                                          -0.0355 (-0.1161, +0.0451) p=0.381  n=5419  [1s]
+E2b system HUN                                          +0.0238 (-0.0631, +0.1107) p=0.584  n=5804  [1s]
+E2b system IRL                                          +0.0302 (-0.0336, +0.0939) p=0.348  n=5352  [1s]
+E2b system MAC                                          +0.0189 (-0.0369, +0.0747) p=0.501  n=4372  [1s]
+E2b system MEX                                          -0.0282 (-0.1236, +0.0671) p=0.557  n=6185  [2s]
+E2b system NLD                                          -0.0842 (-0.1841, +0.0156) p=0.0967  n=4515  [1s]
+E2b system NZL                                          -0.0402 (-0.1285, +0.0481) p=0.365  n=4096  [1s]
+E2b system PAN                                          +0.0089 (-0.0885, +0.1063) p=0.856  n=3544  [1s]
+E2b system SAU                                          +0.0600 (-0.0264, +0.1463) p=0.171  n=5321  [1s]
+E2b system SVN                                          -0.0438 (-0.0989, +0.0114) p=0.118  n=6149  [2s]
+E2c system ARE (sleep)                                  +0.0177 (-0.0598, +0.0951) p=0.649  n=19855  [3s]
+E2c system BRA (sleep)                                  +0.0310 (-0.0657, +0.1277) p=0.523  n=7426  [2s]
+E2c system CRI (sleep)                                  +0.0658 (-0.1216, +0.2533) p=0.485  n=5074  [1s]
+E2c system ESP (sleep)                                  +0.0095 (-0.0568, +0.0759) p=0.775  n=28223  [8s]
+E2c system HKG (sleep)                                  -0.0328 (-0.1359, +0.0703) p=0.527  n=5413  [1s]
+E2c system HUN (sleep)                                  +0.0122 (-0.0978, +0.1222) p=0.824  n=5798  [1s]
+E2c system IRL (sleep)                                  +0.0330 (-0.0580, +0.1241) p=0.471  n=5334  [1s]
+E2c system MAC (sleep)                                  -0.0919 (-0.1708, -0.0129) p=0.0231  n=4360  [1s]
+E2c system MEX (sleep)                                  +0.0044 (-0.1504, +0.1591) p=0.955  n=6174  [2s]
+E2c system NLD (sleep)                                  -0.1967 (-0.4106, +0.0172) p=0.0709  n=4507  [1s]
+E2c system NZL (sleep)                                  -0.0413 (-0.1695, +0.0869) p=0.52  n=4086  [1s]
+E2c system PAN (sleep)                                  +0.0629 (-0.0917, +0.2175) p=0.418  n=3496  [1s]
+E2c system SAU (sleep)                                  +0.0380 (-0.0521, +0.1280) p=0.403  n=5282  [1s]
+E2c system SVN (sleep)                                  -0.0635 (-0.1499, +0.0229) p=0.148  n=6124  [2s]
+E2c system ARE (mhc)                                    -0.9882 (-3.2067, +1.2302) p=0.374  n=19960  [3s]
+E2c system BRA (mhc)                                    +1.4421 (-1.3456, +4.2297) p=0.305  n=7481  [2s]
+E2c system CRI (mhc)                                    +1.8645 (-3.3197, +7.0487) p=0.476  n=5102  [1s]
+E2c system ESP (mhc)                                    -0.2907 (-2.6026, +2.0212) p=0.803  n=28316  [8s]
+E2c system HKG (mhc)                                    -1.6892 (-5.1390, +1.7607) p=0.33  n=5419  [1s]
+E2c system HUN (mhc)                                    -1.2483 (-5.2253, +2.7288) p=0.53  n=5804  [2s]
+E2c system IRL (mhc)                                    +1.1945 (-1.8198, +4.2088) p=0.432  n=5352  [1s]
+E2c system MAC (mhc)                                    +1.2531 (-2.0581, +4.5642) p=0.453  n=4372  [1s]
+E2c system MEX (mhc)                                    -0.7975 (-4.7751, +3.1801) p=0.691  n=6185  [1s]
+E2c system NLD (mhc)                                    -2.9204 (-10.2260, +4.3852) p=0.428  n=4515  [1s]
+E2c system NZL (mhc)                                    -1.3864 (-6.1540, +3.3812) p=0.563  n=4096  [1s]
+E2c system PAN (mhc)                                    -0.3470 (-6.0665, +5.3725) p=0.903  n=3544  [1s]
+E2c system SAU (mhc)                                    +2.5506 (-0.7291, +5.8303) p=0.126  n=5321  [1s]
+E2c system SVN (mhc)                                    -2.9058 (-5.9303, +0.1187) p=0.0595  n=6149  [1s]
+S1 complete case                                        -0.0004 (-0.0262, +0.0255) p=0.977  n=82627  [2s]
+S2 splines for ESCS, age, school ESCS                   +0.0019 (-0.0191, +0.0229) p=0.856  n=111616  [64s]
+S3 modal grade only                                     +0.0010 (-0.0211, +0.0232) p=0.926  n=81186  [30s]
+S4 drop all-9-symptoms-daily responders                 -0.0045 (-0.0248, +0.0158) p=0.658  n=110264  [38s]
+S5 negative control: height (z)                         -0.0076 (-0.0287, +0.0135) p=0.474  n=90592  [32s]
+S7 leave out ARE                                        +0.0002 (-0.0225, +0.0229) p=0.986  n=91656  [34s]
+S7 leave out BRA                                        -0.0008 (-0.0232, +0.0217) p=0.944  n=104135  [38s]
+S7 leave out CRI                                        -0.0041 (-0.0258, +0.0176) p=0.707  n=106514  [38s]
+S7 leave out ESP                                        +0.0019 (-0.0206, +0.0244) p=0.867  n=83300  [30s]
+S7 leave out HKG                                        +0.0054 (-0.0170, +0.0278) p=0.629  n=106197  [36s]
+S7 leave out HUN                                        +0.0006 (-0.0207, +0.0220) p=0.952  n=105812  [38s]
+S7 leave out IRL                                        -0.0017 (-0.0234, +0.0199) p=0.874  n=106264  [37s]
+S7 leave out MAC                                        +0.0008 (-0.0222, +0.0238) p=0.944  n=107244  [39s]
+S7 leave out MEX                                        +0.0018 (-0.0195, +0.0231) p=0.867  n=105431  [37s]
+S7 leave out NLD                                        +0.0038 (-0.0175, +0.0251) p=0.724  n=107101  [37s]
+S7 leave out NZL                                        +0.0057 (-0.0154, +0.0268) p=0.594  n=107520  [39s]
+S7 leave out PAN                                        +0.0009 (-0.0210, +0.0229) p=0.934  n=108072  [39s]
+S7 leave out SAU                                        -0.0056 (-0.0260, +0.0147) p=0.582  n=106295  [39s]
+S7 leave out SVN                                        +0.0074 (-0.0148, +0.0297) p=0.506  n=105467  [37s]
+S8 + other device-policy items                          +0.0009 (-0.0201, +0.0219) p=0.934  n=111616  [42s]
+S10 public schools only                                 -0.0010 (-0.0257, +0.0236) p=0.933  n=77729  [28s]
+S11 + mathematics achievement (PVs)                     +0.0021 (-0.0189, +0.0231) p=0.843  n=111616  [40s]
+S12 drop CRI, MAC, NZL                                  -0.0008 (-0.0251, +0.0236) p=0.951  n=98046  [36s]
+S9 DL: {'est': np.float64(-0.0006), 'se': np.float64(0.0097), 'lo': np.float64(-0.0196), 'hi': np.float64(0.0183), 'p': np.float64(0.9467), 'tau2': np.float64(0.0001), 'I2': np.float64(0.0525), 'Q': np.float64(13.7209), 'pQ': np.float64(0.3938), 'k': 14}
+Standardised primary effect d = 0.0012 (np.float64(-0.0196), np.float64(0.022))  E-value: 1.034 CI: 1.0

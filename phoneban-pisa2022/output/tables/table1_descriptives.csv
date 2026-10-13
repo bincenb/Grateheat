@@ -1,0 +1,19 @@
+variable,All,Ban,No ban,Ban missing,% missing
+Students (unweighted n),111616.0,51936.0,46259.0,13421.0,
+Schools (unweighted n),4520.0,2065.0,1838.0,617.0,
+"Female, %",50.9,51.2,50.8,50.4,0.0
+"Age, years",15.8,15.81,15.8,15.81,0.0
+"Below modal grade, %",18.7,19.8,17.1,21.7,0.0
+ESCS,-0.19,-0.2,-0.19,-0.14,5.2
+"Immigrant background, %",19.1,22.4,16.1,21.3,3.7
+"Repeated a grade, %",12.3,13.0,11.5,13.2,0.6
+"Private school, %",20.9,27.2,15.8,22.8,4.8
+"City >1 million, %",19.4,23.8,15.4,27.9,8.3
+School enrolment,951.8,884.27,976.92,1628.46,15.3
+School mean ESCS,-0.19,-0.2,-0.2,-0.14,4.6
+Psychosomatic score (1-5),2.3,2.29,2.3,2.3,0.0
+"Multiple health complaints, %",41.7,40.5,42.5,42.3,0.0
+Difficulty getting to sleep (1-5),2.44,2.4,2.47,2.45,0.4
+Psychological subscale (1-5),2.41,2.39,2.43,2.41,0.0
+Somatic subscale (1-5),2.16,2.16,2.15,2.16,0.0
+Self-rated health (1 excellent-4 poor),1.82,1.8,1.83,1.85,5.1
