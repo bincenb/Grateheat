@@ -32,10 +32,11 @@ def forest(ax, sys_rows, pooled, xlabel, unit_fmt="{:+.2f}"):
     ax.hlines(y, sys_rows.lo, sys_rows.hi, color=PALETTE["control"], lw=0.8)
     ax.plot(sys_rows.est, y, "s", color=PALETTE["control"], ms=3.5)
     labels = [f"{NAMES[c]} ({per.loc[c, 'ban_pct']:.0f}%)" for c in sys_rows.system]
-    for (lab, p), yy in zip(pooled, [0.9, 0.0]):
+    py = [0.9, 0.0][:len(pooled)] if len(pooled) > 1 else [0.45]
+    for (lab, p), yy in zip(pooled, py):
         ax.hlines(yy, p["lo"], p["hi"], color=PALETTE["primary"], lw=1.4)
         ax.plot(p["est"], yy, "D", color=PALETTE["primary"], ms=4.5)
-    ax.set_yticks(list(y) + [0.9, 0.0])
+    ax.set_yticks(list(y) + py)
     ax.set_yticklabels(labels + [p[0] for p in pooled])
     ax.axvline(0, color=PALETTE["control"], ls="--", lw=0.7, zorder=0)
     ax.spines["left"].set_visible(False)
@@ -90,8 +91,7 @@ for ax, items, letter in ((axs[0], outs, "a"), (axs[1], sens, "b")):
     ax.spines["left"].set_visible(False)
     ax.tick_params(axis="y", length=0)
     ax.set_xlabel("Adjusted difference, ban vs no ban")
-    lim = max(abs(min(r["lo"] for r in rows)), abs(max(r["hi"] for r in rows))) * 1.15
-    ax.set_xlim(-lim, lim)
+    ax.set_xlim(-0.05, 0.05)
     panel_letter(ax, letter, dx=-0.02)
 fig.savefig(f"{F}/fig2_outcomes_sensitivity.pdf")
 fig.savefig(f"{F}/fig2_outcomes_sensitivity.png")

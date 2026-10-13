@@ -13,7 +13,11 @@ Secondary analysis of public PISA 2022 microdata. Question: in the 14 education 
 | `STROBE.md` | STROBE checklist with locations |
 | `output/tables/` | All results as CSV |
 | `output/figures/` | Figures (PDF + 300 dpi PNG) |
-| `output/analysis_log.txt` | Console log of the full analysis run |
+| `output/analysis_log.txt`, `output/followup_sex_log.txt` | Console logs of the analysis runs |
+
+## Main result
+
+Ban vs no ban, adjusted difference in psychosomatic complaints (1–5 scale): **+0.001 (95% CI −0.020 to 0.022), p = 0.91**, n = 111,616 students, 4,520 schools, 14 systems. The secondary outcomes (including sleep-onset difficulty), all sensitivity analyses and the negative control were also null, with low heterogeneity (I² = 5%). See `MANUSCRIPT.md`.
 
 ## Run order
 
@@ -24,7 +28,8 @@ bash   code/00_download.sh        # OECD files -> data_raw/, checksum, unzip, re
 python3 code/01_prepare.py        # recode, exclusions, missingness table  (~30 s)
 python3 code/02_qc_reproduce.py   # reproduce OECD mean math scores; stops if it fails
 python3 code/03_impute.py         # two-level MICE-PMM, M = 20, seed 20221  (~1.5 min)
-python3 code/04_analysis.py       # all models, BRR x 20 imputations       (~50 min on 4 cores)
+python3 code/04_analysis.py       # all pre-specified models, BRR x 20 imputations (~50 min on 4 cores)
+python3 code/04b_followup_sex.py  # POST HOC follow-up of the sex/ESCS interactions (~8 min)
 python3 code/05_figures.py        # figures
 python3 code/06_session_info.py   # package versions
 ```

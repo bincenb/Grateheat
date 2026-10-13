@@ -2,7 +2,7 @@
 see DEVIATIONS.md D8. Decomposes E1a into sex-specific associations and checks whether
 it survives (i) fully sex-stratified models, which let every covariate and every system
 fixed effect differ by sex, (ii) adjustment for the school's share of girls (single-sex
-schools), and (iii) system by system.
+schools), and (iii) system by system. F4 repeats (iii) for the ban x ESCS interaction (E1b).
 """
 import os
 import sys
@@ -39,8 +39,22 @@ with ThreadPool(4) as pool:
                        extra=lambda D, m: [("ban_x_female", D.ban * D.female)]), "F3_system")
         r[0]["system"] = c
         res += r
+    # F4: the same within-system check for the exploratory ban x ESCS interaction (E1b)
+    for c in [c for c in A.SYSTEMS if c != "CRI"]:
+        r = A.run(pool, f"F4 system {c}: ban x ESCS",
+                  dict(y="psc", terms=["ban_x_escs"], fe=False,
+                       subset=lambda D, m, c=c: (D.CNT == c).to_numpy(),
+                       extra=lambda D, m: [("ban_x_escs", D.ban * D.escs)]), "F4_system")
+        r[0]["system"] = c
+        res += r
 
 R = pd.DataFrame(res)
+f4 = R[R.group == "F4_system"]
+dl4 = A.dersimonian_laird(f4.est.to_numpy(), f4.se.to_numpy())
+print("F4 random-effects pooled ban x ESCS:", {k: round(v, 4) for k, v in dl4.items()})
+R = pd.concat([R, pd.DataFrame([dict(group="F4_pooled", analysis="F4 RE-pooled ban x ESCS",
+                                     outcome="psc", term="ban_x_escs", est=dl4["est"], se=dl4["se"],
+                                     lo=dl4["lo"], hi=dl4["hi"], p=dl4["p"])])], ignore_index=True)
 f3 = R[R.group == "F3_system"]
 dl = A.dersimonian_laird(f3.est.to_numpy(), f3.se.to_numpy())
 print("F3 random-effects pooled ban x female:", {k: round(v, 4) for k, v in dl.items()})
