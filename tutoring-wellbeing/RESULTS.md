@@ -2,7 +2,7 @@
 
 **Suggested title:** *Satisfied but anxious? Additional mathematics instruction and adolescent wellbeing in 72 education systems (PISA 2022)*
 
-All numbers come from `results/all_estimates.csv` and `results/summary.json`. Estimates are adjusted differences between students who took any additional mathematics instruction in the past 12 months and those who took none. Positive values mean higher life satisfaction (0–10 scale) among participants. CIs are 95%.
+All numbers come from `results/all_estimates.csv` and `results/summary.json`. Estimates are adjusted differences between students who report taking part in any additional mathematics instruction this school year and those who report none. Positive values mean higher life satisfaction (0–10 scale) among participants. CIs are 95%.
 
 ## Sample
 
@@ -66,7 +66,7 @@ Across 72 education systems, students who take additional mathematics instructio
 
 - Cross-sectional data, so cause and effect can't be separated. Struggling or anxious students may be sent to tutoring (reverse causation); families who pay for tutoring may differ in ways ESCS doesn't capture.
 - Life satisfaction is a single self-reported item. Its meaning may differ across languages and cultures, and measurement invariance can't be tested for a single item. Within-system estimates avoid comparing levels across systems, but the size of associations may still differ for measurement reasons.
-- The exposure measure is coarse: any form in 12 months, no hours, and not split by paid vs free or remedial vs enrichment.
+- The exposure measure is coarse: any form during the current school year, no hours, and not split by paid vs free or remedial vs enrichment.
 - 32% of the exposure is missing, largely from patterns that suggest careless responding. MI assumes data are missing at random; the codings in S9 bracket the estimate (+0.14 to +0.21).
 - There is no measure of prior achievement; grade repetition is a weak proxy.
 - The negative-control outcome is not null, and the E-value is small.
