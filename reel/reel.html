@@ -1,0 +1,381 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"SG";src:url(../fonts/space-grotesk-latin-700-normal.woff2) format("woff2");font-weight:700}
+@font-face{font-family:"SG";src:url(../fonts/space-grotesk-latin-500-normal.woff2) format("woff2");font-weight:500}
+@font-face{font-family:"Plex";src:url(../fonts/ibm-plex-sans-latin-600-normal.woff2) format("woff2");font-weight:600}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#15202B}
+canvas{position:absolute;left:0;top:0;width:1080px;height:1920px}
+</style></head>
+<body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<canvas id="ui" width="1080" height="1920"></canvas>
+<script type="module">
+import * as THREE from '../vendor/three/three.module.js';
+import { STLLoader } from '../vendor/three/STLLoader.js';
+
+const W = 1080, H = 1920;
+const NAVY = '#15202B', ORANGE = '#EB6834', PEACH = '#F2A57F', BLUE = '#2A78D6', PAPER = '#F6F4EF', GREEN = '#1BAF7A';
+
+/* ---------- 3D ---------- */
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+renderer.localClippingEnabled = true;
+renderer.setClearColor(0x15202b);
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff, 0x404a55, 2.0));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.position.set(-300, 500, 400); scene.add(sun);
+const rim = new THREE.DirectionalLight(0xf2a57f, 1.6); rim.position.set(400, 200, -500); scene.add(rim);
+const camera = new THREE.PerspectiveCamera(42, W / H, 1, 50000);
+const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 1000);
+const loader = new STLLoader();
+function mat(color, o = {}) {
+  return new THREE.MeshStandardMaterial({ color, roughness: o.rough ?? 0.55, metalness: o.metal ?? 0.1, side: THREE.DoubleSide,
+    clippingPlanes: o.clip ? [clip] : [], transparent: o.opacity !== undefined, opacity: o.opacity ?? 1, emissive: 0x000000 });
+}
+async function part(file, color, o = {}) {
+  const g = await loader.loadAsync('../models/' + file); g.computeVertexNormals();
+  return new THREE.Mesh(g, mat(color, o));
+}
+// module group
+const modRoot = new THREE.Group(); modRoot.rotation.x = -Math.PI / 2;
+const modSpin = new THREE.Group(); modSpin.add(modRoot); scene.add(modSpin);
+const housing = await part('display_grateheat_housing_1to10.stl', 0xc27a3a, { metal: 0.55, rough: 0.3, clip: true });
+const lid = await part('display_sidewalk_grate_lid_1to10.stl', 0x3a3a38, { metal: 0.6, rough: 0.4 });
+modRoot.add(housing, lid); lid.position.z = 55;
+// center module on origin
+let mb = new THREE.Box3().setFromObject(modSpin); const mc = mb.getCenter(new THREE.Vector3());
+modRoot.position.sub(mc); mb = new THREE.Box3().setFromObject(modSpin);
+const modSize = mb.getSize(new THREE.Vector3());
+// street group
+const stRoot = new THREE.Group(); stRoot.rotation.x = -Math.PI / 2; scene.add(stRoot);
+const spec = [['ground', 0xcfc7b8, { opacity: 0.999 }], ['sidewalk', 0xe7e4dc], ['train', 0x9aa3ab, { metal: 0.3 }], ['rails', 0x5b5b58],
+  ['grate', 0x3a3a38, { metal: 0.5 }], ['module', 0xeb6834], ['pipe', 0xeb6834], ['heatpump', 0x2a78d6], ['bore', 0x1baf7a], ['school', 0xb5654a]];
+const st = {};
+for (const [n, c, o] of spec) { st[n] = await part(`street_${n}.stl`, c, o || {}); stRoot.add(st[n]); }
+let sb = new THREE.Box3().setFromObject(stRoot); const sc = sb.getCenter(new THREE.Vector3());
+stRoot.position.sub(sc); sb = new THREE.Box3().setFromObject(stRoot);
+const stSize = sb.getSize(new THREE.Vector3());
+const box = n => new THREE.Box3().setFromObject(st[n]);
+const ctr = n => box(n).getCenter(new THREE.Vector3());
+const trainBox = box('train'), trainSize = trainBox.getSize(new THREE.Vector3());
+const trainAxis = trainSize.x > trainSize.z ? 'x' : 'z';
+const trainHome = st.train.position.clone();
+window.__info = { modSize, stSize, trainSize, trainAxis, parts: Object.fromEntries(Object.keys(st).map(n => [n, [box(n).min.toArray().map(Math.round), box(n).max.toArray().map(Math.round)]])) };
+
+function project(v) { const p = v.clone().project(camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H, p.z]; }
+
+/* ---------- data ---------- */
+const [schools, tunnels] = await Promise.all([fetch('../data/schools.json').then(r => r.json()), fetch('../data/tunnels.json').then(r => r.json())]);
+const near = schools.filter(s => s.d <= 150);
+let la0 = 1e9, la1 = -1e9, lo0 = 1e9, lo1 = -1e9;
+near.forEach(s => { la0 = Math.min(la0, s.la); la1 = Math.max(la1, s.la); lo0 = Math.min(lo0, s.lo); lo1 = Math.max(lo1, s.lo); });
+const kx = Math.cos(40.73 * Math.PI / 180);
+const spanX = (lo1 - lo0) * kx, spanY = la1 - la0;
+const mapScale = Math.min(960 / spanX, 900 / spanY);
+const mapCx = (lo0 + lo1) / 2, mapCy = (la0 + la1) / 2;
+const mapXY = (la, lo) => [W / 2 + (lo - mapCx) * kx * mapScale, 1090 + (mapCy - la) * mapScale];
+// stable pseudo-random order for dot pop-in (west-to-east sweep with jitter)
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+near.forEach(s => { s.order = (mapXY(s.la, s.lo)[1] / H) * 0.7 + rnd() * 0.3; });
+const nearSorted = [...near].sort((a, b) => a.order - b.order);
+
+/* ---------- 2D helpers ---------- */
+const ui = document.getElementById('ui'), g = ui.getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const eout = t => 1 - Math.pow(1 - t, 3);
+const back = t => { const c1 = 2.2, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+
+function shadowText(txt, x, y, font, fill, opt = {}) {
+  g.font = font; g.textAlign = opt.align || 'center'; g.textBaseline = 'middle';
+  g.lineJoin = 'round';
+  if (opt.stroke !== false) { g.strokeStyle = 'rgba(10,14,20,.92)'; g.lineWidth = opt.lw ?? 14; g.strokeText(txt, x, y); }
+  g.fillStyle = fill; g.fillText(txt, x, y);
+}
+// Word-by-word caption. words: [{w, hi}] ; appears from t0 one word every dt; pops with overshoot.
+function caption(t, t0, lines, { y = 420, size = 92, dt = 0.12, lh = 1.12, t1 = 1e9, color = '#fff' } = {}) {
+  if (t < t0 || t > t1 + 0.15) return;
+  const out = t > t1 ? 1 - prog(t, t1, 0.15) : 1;
+  let k = 0;
+  lines.forEach((line, li) => {
+    const font = `700 ${line.size || size}px SG, "Noto Color Emoji"`;
+    g.font = font;
+    const words = line.words;
+    const sp = g.measureText(' ').width;
+    const widths = words.map(w => g.measureText(w.w).width);
+    const total = widths.reduce((a, b) => a + b, 0) + sp * (words.length - 1);
+    let x = W / 2 - total / 2;
+    const yy = y + li * (line.size || size) * lh + (line.dy || 0);
+    words.forEach((w, wi) => {
+      const ta = t0 + k * dt; k++;
+      const p = prog(t, ta, 0.22);
+      if (p <= 0) { x += widths[wi] + sp; return; }
+      const s = back(p) * out;
+      const cx = x + widths[wi] / 2;
+      g.save(); g.translate(cx, yy); g.scale(s, s); g.globalAlpha = clamp(p * 3) * out;
+      if (w.hi) {
+        const pad = 16, hgt = (line.size || size) * 1.08;
+        g.fillStyle = w.hi === true ? ORANGE : w.hi;
+        g.rotate(-0.025);
+        roundRect(-widths[wi] / 2 - pad, -hgt / 2 - 4, widths[wi] + pad * 2, hgt, 14); g.fill();
+        g.rotate(0.025);
+        shadowText(w.w, 0, 0, font, '#fff', { stroke: false });
+      } else shadowText(w.w, 0, 0, font, w.c || color);
+      g.restore();
+      x += widths[wi] + sp;
+    });
+  });
+}
+const L = (s, o = {}) => ({ words: s.split(' ').map(w => { const hi = w.startsWith('*'); return { w: hi ? w.slice(1) : w, hi }; }), ...o });
+function roundRect(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+// steam / heat particles rising from a screen point
+function steam(t, x, y, spread, n, strength = 1, hot = false) {
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < n; i++) {
+    const r1 = Math.sin(i * 12.9898) * 43758.5453 % 1, r2 = Math.sin(i * 78.233) * 12543.11 % 1, r3 = Math.sin(i * 3.71) * 9973.1 % 1;
+    const life = 1.6 + Math.abs(r3) * 1.2;
+    const age = ((t + Math.abs(r1) * 10) % life) / life;
+    const px = x + r2 * spread + Math.sin(t * 2 + i) * 30 * age;
+    const py = y - age * 520 * (0.7 + Math.abs(r1) * 0.6);
+    const rad = 30 + age * 110;
+    const a = Math.sin(age * Math.PI) * 0.16 * strength;
+    const grd = g.createRadialGradient(px, py, 0, px, py, rad);
+    const col = hot ? `rgba(235,120,60,${a * 1.4})` : `rgba(240,235,228,${a})`;
+    grd.addColorStop(0, col); grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = grd; g.beginPath(); g.arc(px, py, rad, 0, Math.PI * 2); g.fill();
+  }
+  g.restore();
+}
+function vignette(a = 0.55) {
+  const grd = g.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.75);
+  grd.addColorStop(0, 'rgba(10,14,20,0)'); grd.addColorStop(1, `rgba(10,14,20,${a})`);
+  g.fillStyle = grd; g.fillRect(0, 0, W, H);
+}
+function flash(t, at, d = 0.18, c = '255,255,255', a0 = 0.7) {
+  const p = prog(t, at, d); if (p <= 0 || p >= 1) return;
+  g.fillStyle = `rgba(${c},${a0 * (1 - p)})`; g.fillRect(0, 0, W, H);
+}
+function pill(txt, x, y, bg, fg = '#fff', size = 40, p = 1) {
+  if (p <= 0) return;
+  g.font = `600 ${size}px Plex, "Noto Color Emoji"`; const w = g.measureText(txt).width + 44, h = size * 1.7;
+  g.save(); g.translate(x, y); const s = back(clamp(p)); g.scale(s, s); g.globalAlpha = clamp(p * 3);
+  g.fillStyle = bg; roundRect(-w / 2, -h / 2, w, h, h / 2); g.fill();
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, 0, 2); g.restore();
+}
+// camera shake
+function shake(t, hits, amt = 14) {
+  let dx = 0, dy = 0;
+  hits.forEach(h => { const p = prog(t, h, 0.28); if (p > 0 && p < 1) { const e = (1 - p) * amt; dx += Math.sin(t * 190) * e; dy += Math.cos(t * 160) * e; } });
+  return [dx, dy];
+}
+// progress bar at very top (retention trick)
+function topBar(t) { g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(0, 0, W, 8); g.fillStyle = ORANGE; g.fillRect(0, 0, W * clamp(t / 24), 8); }
+
+/* ---------- camera rigs ---------- */
+function orbit(target, dist, az, el) {
+  camera.position.set(target.x + dist * Math.cos(el) * Math.sin(az), target.y + dist * Math.sin(el), target.z + dist * Math.cos(el) * Math.cos(az));
+  camera.lookAt(target); camera.updateProjectionMatrix();
+}
+const ORIGIN = new THREE.Vector3();
+const stDiag = Math.max(stSize.x, stSize.y, stSize.z);
+const modDiag = Math.max(modSize.x, modSize.y, modSize.z);
+function glow(m, a, col = 0xeb6834) { m.material.emissive.setHex(col); m.material.emissiveIntensity = a; }
+
+/* ---------- frame ---------- */
+window.renderAt = function (t) {
+  g.clearRect(0, 0, W, H);
+  // defaults
+  modSpin.visible = false; stRoot.visible = false;
+  lid.position.z = 55; clip.constant = 1000;
+  st.ground.material.opacity = 0.999; st.ground.material.depthWrite = true;
+  ['module', 'pipe', 'heatpump', 'school', 'bore'].forEach(n => glow(st[n], 0));
+  glow(housing, 0);
+  st.train.position.copy(trainHome);
+  camera.fov = 42;
+  const [sx, sy] = shake(t, [2.0, 6.0, 16, 17, 18, 19, 20.5]);
+
+  if (t < 2.0) {
+    // HOOK: grate lid close-up, steam pouring out
+    modSpin.visible = true; housing.visible = false; lid.visible = true;
+    const lc = new THREE.Box3().setFromObject(lid).getCenter(new THREE.Vector3());
+    const p = t / 2;
+    orbit(lc, modDiag * lerp(1.5, 1.1, eio(p)), 0.5 + p * 0.25, 1.05);
+    camera.position.x += sx * 0.3;
+    renderer.render(scene, camera); housing.visible = true;
+    const [px, py] = project(lc);
+    steam(t, px - 40, py + 60, 300, 46, 1.5, true);
+    steam(t + 3, px, py, 340, 40, 1.4);
+    vignette(0.7);
+    caption(t, 0.05, [L('NYC subway grates'), L('are blowing out'), L('*FREE *HEAT 🔥', { size: 130, dy: 20 })], { y: 470, dt: 0.13, t1: 1.9 });
+  } else if (t < 5.5) {
+    // Tunnel: train races through, camera pushes to the grate
+    stRoot.visible = true;
+    const p = (t - 2) / 3.5;
+    const run = ((t - 2) * 1.0) % 1.6 / 1.6;          // train passes ~2x
+    const len = trainAxis === 'x' ? stSize.x : stSize.z;
+    st.train.position[trainAxis === 'x' ? 'x' : 'y'] = trainHome[trainAxis === 'x' ? 'x' : 'y'] + lerp(-len * 1.1, len * 1.1, run) * (trainAxis === 'x' ? 1 : -1);
+    st.ground.material.opacity = lerp(0.25, 0.999, eio(prog(t, 4.2, 1))); st.ground.material.depthWrite = t > 4.6;
+    const gc = ctr('grate');
+    const tgt = new THREE.Vector3().lerpVectors(ORIGIN, gc, eio(prog(t, 3.8, 1.6)));
+    orbit(tgt, stDiag * lerp(2.3, 0.75, eio(p)), lerp(-0.9, -0.45, p), lerp(0.25, 0.75, eio(prog(t, 3.8, 1.6))));
+    camera.position.x += sx; camera.position.y += sy;
+    renderer.render(scene, camera);
+    if (t > 3.9) { const [gx, gy] = project(gc); steam(t, gx, gy, 220, 36, clamp((t - 3.9) * 1.5), true); steam(t + 5, gx, gy, 260, 30, clamp((t - 3.9) * 1.5)); }
+    vignette(0.5);
+    flash(t, 2.0, 0.25);
+    caption(t, 2.05, [L('Every train dumps'), L('heat into the'), L('*tunnels 🚇', { size: 120, dy: 14 })], { y: 400, t1: 3.85 });
+    caption(t, 4.0, [L('...and it just'), L('*floats *away 💨', { size: 120, dy: 14 })], { y: 420, t1: 5.4 });
+  } else if (t < 8.0) {
+    // The module: lid lifts, then cut open
+    modSpin.visible = true;
+    const p = (t - 5.5) / 2.5;
+    modSpin.rotation.y = lerp(-0.6, 0.9, p);
+    lid.position.z = 55 + 90 * eout(prog(t, 6.0, 0.45));
+    clip.constant = t > 7.0 ? lerp(1000, 45 - 55 * 0.8, 1) : 1000;
+    if (t > 7.0) clip.constant = lerp(modSize.y, 45 - 50 * 0.8, eout(prog(t, 7.0, 0.5)));
+    glow(housing, 0.15 + 0.25 * Math.max(0, Math.sin((t - 6) * 6)) * (t > 6 ? 1 : 0));
+    orbit(new THREE.Vector3(0, modSize.y * 0.05, 0), modDiag * lerp(3.0, 2.5, eio(p)), 0, 0.55);
+    camera.position.x += sx; camera.position.y += sy;
+    renderer.render(scene, camera);
+    vignette(0.45); flash(t, 5.5, 0.2); flash(t, 6.0, 0.18, '235,104,52', 0.35);
+    caption(t, 5.55, [L('So we built a grate'), L('that *CATCHES it')], { y: 400, t1: 7.9 });
+    pill('copper fins + glycol tubes', W / 2, 1380, 'rgba(21,32,43,.85)', PEACH, 42, prog(t, 7.1, 0.3));
+    pill('real size ≈ 1.6 × 0.9 m', W / 2, 1480, 'rgba(21,32,43,.85)', '#fff', 36, prog(t, 7.35, 0.3));
+  } else if (t < 12.0) {
+    // System: heat flows grate -> heat pump -> school
+    stRoot.visible = true;
+    st.ground.material.opacity = 0.18; st.ground.material.depthWrite = false;
+    const p = (t - 8) / 4;
+    const steps = [['module', 8.4], ['pipe', 8.4], ['heatpump', 9.4], ['school', 10.4], ['bore', 11.2]];
+    steps.forEach(([n, at]) => { const q = prog(t, at, 0.3); glow(st[n], q * (0.55 + 0.25 * Math.sin(t * 9)), n === 'heatpump' ? 0x2a78d6 : n === 'bore' ? 0x1baf7a : 0xeb6834); });
+    const run = ((t - 8) * 0.9) % 1.6 / 1.6;
+    const len = trainAxis === 'x' ? stSize.x : stSize.z;
+    st.train.position[trainAxis === 'x' ? 'x' : 'y'] = trainHome[trainAxis === 'x' ? 'x' : 'y'] + lerp(-len * 1.1, len * 1.1, run) * (trainAxis === 'x' ? 1 : -1);
+    orbit(new THREE.Vector3(0, -stSize.y * 0.05, 0), stDiag * lerp(2.6, 2.4, p), lerp(0.5, 0.62, p), 0.42);
+    camera.position.x += sx; camera.position.y += sy;
+    renderer.render(scene, camera);
+    vignette(0.4); flash(t, 8.0, 0.2);
+    caption(t, 8.0, [L('Here\'s how it works 👇', { size: 76 })], { y: 330, dt: 0.08 });
+    const lab = [['1  Grate catches the heat', 'module', 8.4, ORANGE], ['2  Heat pump boosts it', 'heatpump', 9.4, BLUE], ['3  School next door stays warm 🏫', 'school', 10.4, '#B5654A']];
+    lab.forEach(([txt, n, at, col], i) => {
+      const q = prog(t, at, 0.3); if (q <= 0) return;
+      const [x, y] = project(ctr(n));
+      const ly = 1290 + i * 112;
+      g.save(); g.globalAlpha = clamp(q * 2) * 0.9; g.strokeStyle = col; g.lineWidth = 5; g.setLineDash([10, 10]);
+      g.beginPath(); g.moveTo(x, y); g.lineTo(W / 2, ly - 40); g.stroke(); g.restore();
+      g.fillStyle = col; g.beginPath(); g.arc(x, y, 14 * back(q), 0, 7); g.fill();
+      pill(txt, W / 2, ly, col, '#fff', 44, q);
+    });
+    if (t > 11.2) pill('+ summer heat saved underground for winter', W / 2, 1640, 'rgba(27,175,122,.92)', '#fff', 32, prog(t, 11.2, 0.3));
+  } else if (t < 16.0) {
+    // MAP
+    g.fillStyle = NAVY; g.fillRect(0, 0, W, H);
+    g.save(); g.translate(sx, sy);
+    // grid
+    g.strokeStyle = 'rgba(255,255,255,.04)'; g.lineWidth = 2;
+    for (let x = 0; x < W; x += 60) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    // tunnels draw in
+    const tp = eout(prog(t, 12.0, 0.9));
+    g.strokeStyle = 'rgba(160,170,180,.75)'; g.lineWidth = 5; g.lineCap = 'round';
+    const nt = Math.floor(tunnels.length * tp);
+    for (let i = 0; i < nt; i++) { const s = tunnels[i]; const [a, b] = mapXY(s[0], s[1]), [c, d] = mapXY(s[2], s[3]); g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.stroke(); }
+    // dots
+    const dp = prog(t, 12.5, 1.7);
+    const shown = Math.floor(nearSorted.length * eio(dp));
+    const focus = prog(t, 14.4, 0.35);
+    nearSorted.forEach((s, i) => {
+      if (i >= shown) return;
+      const [x, y] = mapXY(s.la, s.lo);
+      const age = clamp((dp - i / nearSorted.length) * 12);
+      const r = (s.p ? 13 : 10) * back(clamp(age));
+      const dim = s.p ? 1 : 1 - focus * 0.7;
+      g.globalAlpha = dim;
+      g.fillStyle = s.dac ? ORANGE : BLUE; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+      g.globalAlpha = 1;
+      if (s.p && focus > 0) {
+        g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.arc(x, y, r + 6 + 10 * (1 - eout(focus)), 0, 7); g.stroke();
+        const pulse = ((t - 14.4) * 1.4) % 1; g.strokeStyle = `rgba(235,104,52,${(1 - pulse) * focus})`; g.lineWidth = 4;
+        g.beginPath(); g.arc(x, y, r + 8 + pulse * 40, 0, 7); g.stroke();
+      }
+    });
+    g.restore();
+    // grad for legibility
+    const grd = g.createLinearGradient(0, 0, 0, 620); grd.addColorStop(0, 'rgba(21,32,43,.95)'); grd.addColorStop(1, 'rgba(21,32,43,0)');
+    g.fillStyle = grd; g.fillRect(0, 0, W, 620);
+    const n = Math.round(179 * eio(dp));
+    if (t < 14.4) {
+      const s = 1 + 0.06 * Math.max(0, Math.sin(t * 40)) * (dp < 1 ? 1 : 0);
+      g.save(); g.translate(W / 2, 300); g.scale(s, s); shadowText(String(n), 0, 0, '700 230px SG', ORANGE, { lw: 18 }); g.restore();
+      caption(t, 12.3, [L('NYC schools sit right', { size: 66 }), L('on top of a *subway *tunnel', { size: 66 })], { y: 470, dt: 0.08, t1: 14.3 });
+    } else {
+      const s = back(prog(t, 14.4, 0.3));
+      g.save(); g.translate(W / 2, 300); g.scale(s, s); shadowText('19', 0, 0, '700 230px SG', '#fff', { lw: 18 }); g.restore();
+      caption(t, 14.5, [L('we\'d start with these 🎯', { size: 66 }), L('oil-heated · pre-1960 · high need', { size: 44, dy: 34, words: [{ w: 'oil-heated · pre-1960 · high need', c: PEACH }] })], { y: 470, dt: 0.08 });
+    }
+    g.font = '500 30px SG'; g.fillStyle = 'rgba(255,255,255,.5)'; g.textAlign = 'center';
+    g.fillText('each dot = a public school within 150 m of an underground line', W / 2, 1620);
+    flash(t, 12.0, 0.2); flash(t, 14.4, 0.2, '235,104,52', 0.4);
+  } else if (t < 20.0) {
+    // STATS SLAM over spinning module
+    modSpin.visible = true;
+    modSpin.rotation.y = t * 0.8; lid.position.z = 55 + 60;
+    orbit(new THREE.Vector3(0, 0, 0), modDiag * 3.4, 0, 0.5);
+    renderer.render(scene, camera);
+    g.fillStyle = 'rgba(21,32,43,.72)'; g.fillRect(0, 0, W, H);
+    g.save(); g.translate(sx, sy);
+    const stats = [
+      [16.0, '580', 'MWh of heat a year', 'for one school with 4 modules'],
+      [17.0, '60%', 'of a typical school’s heat', 'from air that was going to waste'],
+      [18.0, '−123 t', 'CO₂ every year', 'vs. burning heating oil'],
+      [19.0, '~2.8×', 'heat out per unit of power', 'seasonal heat pump efficiency'],
+    ];
+    let cur = stats.filter(s => t >= s[0]).pop();
+    const q = prog(t, cur[0], 0.25);
+    const s = back(q);
+    g.save(); g.translate(W / 2, 760); g.scale(s, s); g.rotate((1 - q) * -0.08);
+    shadowText(cur[1], 0, 0, '700 260px SG', ORANGE, { lw: 22 }); g.restore();
+    g.globalAlpha = clamp(q * 2);
+    shadowText(cur[2], W / 2, 960, '700 76px SG', '#fff', { lw: 12 });
+    shadowText(cur[3], W / 2, 1050, '600 44px Plex', PEACH, { lw: 10 });
+    g.globalAlpha = 1;
+    // progress dots
+    stats.forEach((st_, i) => { g.fillStyle = t >= st_[0] ? ORANGE : 'rgba(255,255,255,.25)'; g.beginPath(); g.arc(W / 2 - 75 + i * 50, 1200, 12, 0, 7); g.fill(); });
+    g.restore();
+    g.font = '600 30px Plex'; g.fillStyle = 'rgba(255,255,255,.55)'; g.textAlign = 'center';
+    g.fillText('middle-case estimate from our energy model', W / 2, 1300);
+    [16, 17, 18, 19].forEach(h => flash(t, h, 0.14, '235,104,52', 0.45));
+  } else {
+    // CTA
+    modSpin.visible = true;
+    modSpin.rotation.y = t * 0.6; lid.position.z = 55 + 60 * (1 - eout(prog(t, 20.4, 0.5)));
+    orbit(new THREE.Vector3(0, -modSize.y * 0.3, 0), modDiag * 3.6, 0, 0.45);
+    camera.position.y += sy;
+    renderer.render(scene, camera);
+    vignette(0.5);
+    const p = prog(t, 20.4, 0.35);
+    g.save(); g.translate(W / 2 + sx, 470); const s = back(p); g.scale(s, s);
+    shadowText('GrateHeat', 0, 0, '700 170px SG', '#fff', { lw: 20 });
+    g.restore();
+    if (p > 0) { g.fillStyle = ORANGE; g.fillRect(W / 2 - 300 * eout(prog(t, 20.6, 0.4)), 570, 600 * eout(prog(t, 20.6, 0.4)), 10); }
+    g.globalAlpha = clamp(prog(t, 20.8, 0.3));
+    shadowText('Team V.E.I.N.S. · NYAS Junior Academy', W / 2, 640, '600 42px Plex', PEACH, { lw: 10 });
+    g.globalAlpha = 1;
+    caption(t, 21.4, [L('Should NYC', { size: 84 }), L('build this? 👇', { size: 84 })], { y: 1290, dt: 0.12 });
+    pill('follow for the test-rig results 🔬', W / 2, 1560, ORANGE, '#fff', 40, prog(t, 22.6, 0.3));
+    flash(t, 20.0, 0.25); flash(t, 20.4, 0.2, '255,255,255', 0.5);
+    // fade out at very end
+    const fo = prog(t, 23.6, 0.4); if (fo > 0) { g.fillStyle = `rgba(21,32,43,${fo})`; g.fillRect(0, 0, W, H); }
+  }
+  topBar(t);
+};
+await document.fonts.load('700 100px SG'); await document.fonts.load('500 30px SG'); await document.fonts.load('600 30px Plex');
+await document.fonts.load('40px "Noto Color Emoji"', '🔥');
+window.renderAt(0);
+window.__ready = true;
+</script>
+</body></html>
